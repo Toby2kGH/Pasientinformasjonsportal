@@ -1,0 +1,211 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model HealthRegion {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  sortOrder Int
+  hospitals Hospital[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Hospital {
+  id          String       @id @default(cuid())
+  name        String
+  shortName   String
+  logoUrl     String?
+  websiteUrl  String?
+  region      HealthRegion @relation(fields: [regionId], references: [id])
+  regionId    String
+  departments Department[]
+  sortOrder   Int          @default(0)
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([regionId])
+}
+
+model Department {
+  id             String   @id @default(cuid())
+  name           String
+  hospital       Hospital @relation(fields: [hospitalId], references: [id])
+  hospitalId     String
+  phoneNumber    String?
+  emergencyPhone String?
+  openingHours   String?
+  email          String?
+  address        String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([hospitalId])
+}
+
+model TumorGroup {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  iconName    String?
+  sortOrder   Int       @default(0)
+  regimens    Regimen[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Regimen {
+  id                  String               @id @default(cuid())
+  name                String
+  slug                String               @unique
+  genericNames        String[]
+  brandNames          String[]
+  tumorGroup          TumorGroup           @relation(fields: [tumorGroupId], references: [id])
+  tumorGroupId        String
+  treatmentType       TreatmentType
+  administrationRoute AdministrationRoute
+  cycleDescription    String?
+  numberOfCycles      String?
+  patientInfoSections PatientInfoSection[]
+  sideEffects         SideEffect[]
+  alertInstructions   AlertInstruction[]
+  premedication       Premedication[]
+  isActive            Boolean              @default(true)
+  sortOrder           Int                  @default(0)
+  lastReviewedAt      DateTime?
+  lastReviewedBy      String?
+  sourceReference     String?
+  cytodoseCode        String?
+  version             Int                  @default(1)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@index([tumorGroupId])
+  @@index([slug])
+}
+
+enum TreatmentType {
+  CHEMOTHERAPY
+  IMMUNOTHERAPY
+  TARGETED_THERAPY
+  HORMONE_THERAPY
+  COMBINATION
+}
+
+enum AdministrationRoute {
+  INTRAVENOUS
+  ORAL
+  SUBCUTANEOUS
+  COMBINATION_IV_ORAL
+}
+
+model PatientInfoSection {
+  id          String      @id @default(cuid())
+  regimen     Regimen     @relation(fields: [regimenId], references: [id], onDelete: Cascade)
+  regimenId   String
+  sectionType SectionType
+  title       String
+  content     String
+  sortOrder   Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([regimenId])
+}
+
+enum SectionType {
+  INTRODUCTION
+  INDICATION
+  PREPARATION
+  ADMINISTRATION
+  SIDE_EFFECTS
+  NAUSEA_MANAGEMENT
+  DIETARY_ADVICE
+  FERTILITY
+  GENERAL_ADVICE
+  IMPORTANT_INFO
+}
+
+model SideEffect {
+  id          String         @id @default(cuid())
+  regimen     Regimen        @relation(fields: [regimenId], references: [id], onDelete: Cascade)
+  regimenId   String
+  name        String
+  description String
+  frequency   SideEffectFreq
+  severity    String?
+  management  String?
+  sortOrder   Int            @default(0)
+
+  @@index([regimenId])
+}
+
+enum SideEffectFreq {
+  VERY_COMMON
+  COMMON
+  UNCOMMON
+  RARE
+  VARIABLE
+}
+
+model AlertInstruction {
+  id          String       @id @default(cuid())
+  regimen     Regimen      @relation(fields: [regimenId], references: [id], onDelete: Cascade)
+  regimenId   String
+  urgency     AlertUrgency
+  instruction String
+  action      String
+  sortOrder   Int          @default(0)
+
+  @@index([regimenId])
+}
+
+enum AlertUrgency {
+  EMERGENCY
+  URGENT
+  SOON
+  ROUTINE
+}
+
+model Premedication {
+  id         String   @id @default(cuid())
+  regimen    Regimen  @relation(fields: [regimenId], references: [id], onDelete: Cascade)
+  regimenId  String
+  medication String
+  timing     String
+  isRequired Boolean  @default(true)
+  notes      String?
+  sortOrder  Int      @default(0)
+
+  @@index([regimenId])
+}
+
+model UserPreference {
+  id                   String   @id @default(cuid())
+  sessionId            String   @unique
+  favoriteHospitalId   String?
+  favoriteDepartmentId String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  action     String
+  changedBy  String
+  changeData Json?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
