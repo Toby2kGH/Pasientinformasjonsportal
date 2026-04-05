@@ -1,12 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { SectionType, TreatmentType, AdministrationRoute } from '@prisma/client';
 import { treatmentTypeLabel, treatmentTypeBadgeColor, administrationRouteLabel, formatMarkdown } from '@/lib/utils';
 import AlertBox from './alert-box';
 import SideEffectTable from './side-effect-table';
 import ContactFooter from './contact-footer';
 import { useHospital } from '@/lib/hospital-context';
-import { Printer, Calendar, User, BookOpen } from 'lucide-react';
+import { Printer, Calendar, User, BookOpen, AlertTriangle } from 'lucide-react';
 
 interface PatientInfoSection {
   sectionType: SectionType;
@@ -70,28 +71,114 @@ const sectionOrder: SectionType[] = [
 
 export default function PatientInfoSheet({ regimen }: PatientInfoSheetProps) {
   const { selected } = useHospital();
+  const [showPrintWarning, setShowPrintWarning] = useState(false);
 
   const sortedSections = [...regimen.patientInfoSections].sort(
     (a, b) => sectionOrder.indexOf(a.sectionType) - sectionOrder.indexOf(b.sectionType)
   );
 
+  const printDate = new Date().toLocaleDateString('nb-NO', {
+    year: 'numeric', month: 'long', day: 'numeric',
+  });
+
   function handlePrint() {
+    if (!selected) {
+      setShowPrintWarning(true);
+      return;
+    }
+    setShowPrintWarning(false);
+    window.print();
+  }
+
+  function printAnyway() {
+    setShowPrintWarning(false);
     window.print();
   }
 
   return (
     <article className="max-w-3xl mx-auto">
-      {/* Print hospital header */}
-      {selected && (
-        <div className="print-hospital-header hidden print:flex items-center gap-4 mb-6 pb-4 border-b-2 border-medical-blue">
-          <div>
-            <p className="font-serif font-bold text-xl text-medical-blue">{selected.hospitalName}</p>
-            <p className="text-gray-600">{selected.departmentName}</p>
-          </div>
-        </div>
-      )}
 
-      {/* Article header */}
+      {/* ── PRINT HEADER (only visible when printing) ─────────── */}
+      <div className="hidden print:block mb-6 pb-4 border-b-2 border-medical-blue">
+        {selected ? (
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="font-serif font-bold text-xl text-medical-blue">{selected.hospitalName}</p>
+              <p className="text-gray-600 text-sm">{selected.departmentName}</p>
+            </div>
+            <div className="text-right text-xs text-gray-500">
+              <p>Skrevet ut: {printDate}</p>
+              {regimen.lastReviewedAt && (
+                <p>Faglig gjennomgått: {new Date(regimen.lastReviewedAt).toLocaleDateString('nb-NO', { year: 'numeric', month: 'long' })}</p>
+              )}
+              <p>Versjon {regimen.version}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-start justify-between">
+            <p className="font-serif font-bold text-xl text-gray-500 italic">
+              [Sykehus ikke valgt — se kreftinfo.no]
+            </p>
+            <div className="text-right text-xs text-gray-500">
+              <p>Skrevet ut: {printDate}</p>
+              <p>Versjon {regimen.version}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── PRINT BUTTON — prominent, above the fold ──────────── */}
+      <div className="no-print mb-6">
+        {/* Warning: no hospital selected */}
+        {showPrintWarning && (
+          <div className="mb-3 flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-xl p-4">
+            <AlertTriangle className="text-amber-600 shrink-0 mt-0.5" size={20} />
+            <div className="flex-1">
+              <p className="font-semibold text-amber-800">Ingen avdeling valgt</p>
+              <p className="text-sm text-amber-700 mt-0.5">
+                Pasientarket vil bli skrevet ut <strong>uten kontaktinformasjon</strong> i bunnen.
+                Velg sykehus og avdeling i sidepanelet til høyre for å inkludere telefonnummer
+                og åpningstider.
+              </p>
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={printAnyway}
+                  className="text-xs border border-amber-400 text-amber-700 rounded px-3 py-1.5 hover:bg-amber-100 transition-colors"
+                >
+                  Skriv ut likevel (uten kontaktinfo)
+                </button>
+                <button
+                  onClick={() => setShowPrintWarning(false)}
+                  className="text-xs text-amber-600 hover:underline px-2"
+                >
+                  Avbryt
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={handlePrint}
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-medical-blue text-white rounded-xl px-6 py-3 font-medium hover:bg-blue-800 transition-colors shadow-sm"
+        >
+          <Printer size={18} />
+          Skriv ut pasientark
+          {selected && (
+            <span className="text-blue-200 text-sm font-normal">
+              — {selected.hospitalShortName}
+            </span>
+          )}
+        </button>
+        {!selected && (
+          <p className="text-xs text-amber-600 mt-1.5 flex items-center gap-1">
+            <AlertTriangle size={11} />
+            Velg sykehus i sidepanelet for å få kontaktinfo på utskriften
+          </p>
+        )}
+      </div>
+
+      {/* ── ARTICLE HEADER ────────────────────────────────────── */}
       <header className="mb-6 pb-6 border-b border-gray-200">
         <div className="flex flex-wrap items-center gap-2 mb-2 text-sm text-gray-500">
           <a href={`/${regimen.tumorGroup.slug}`} className="hover:text-medical-blue">
@@ -140,7 +227,8 @@ export default function PatientInfoSheet({ regimen }: PatientInfoSheetProps) {
           )}
         </div>
 
-        <div className="flex items-center gap-4 mt-4 text-xs text-gray-400">
+        {/* Version info — visible on screen */}
+        <div className="no-print flex items-center gap-4 mt-4 text-xs text-gray-400">
           {regimen.lastReviewedAt && (
             <span className="flex items-center gap-1">
               <Calendar size={12} />
@@ -155,22 +243,14 @@ export default function PatientInfoSheet({ regimen }: PatientInfoSheetProps) {
           )}
           <span>v{regimen.version}</span>
         </div>
-
-        <button
-          onClick={handlePrint}
-          className="no-print mt-4 flex items-center gap-2 text-sm text-medical-blue border border-medical-blue rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors"
-        >
-          <Printer size={15} />
-          Skriv ut pasientark
-        </button>
       </header>
 
-      {/* Alert box — always first and prominent */}
+      {/* ── ALERT BOX — always prominent ──────────────────────── */}
       {regimen.alertInstructions.length > 0 && (
         <AlertBox alerts={regimen.alertInstructions} />
       )}
 
-      {/* Premedication */}
+      {/* ── PREMEDICATION ─────────────────────────────────────── */}
       {regimen.premedication.length > 0 && (
         <section className="my-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
           <h2 className="font-serif font-semibold text-medical-blue mb-3">Medisiner du får i forkant</h2>
@@ -191,7 +271,7 @@ export default function PatientInfoSheet({ regimen }: PatientInfoSheetProps) {
         </section>
       )}
 
-      {/* Main content sections */}
+      {/* ── MAIN CONTENT SECTIONS ─────────────────────────────── */}
       {sortedSections.map((section, i) => (
         <section key={i} className="my-6">
           <h2 className="font-serif font-semibold text-xl text-gray-900 mb-3 pb-1 border-b border-gray-200">
@@ -204,7 +284,7 @@ export default function PatientInfoSheet({ regimen }: PatientInfoSheetProps) {
         </section>
       ))}
 
-      {/* Side effects */}
+      {/* ── SIDE EFFECTS ──────────────────────────────────────── */}
       {regimen.sideEffects.length > 0 && (
         <section className="my-6">
           <h2 className="font-serif font-semibold text-xl text-gray-900 mb-3 pb-1 border-b border-gray-200">
@@ -214,7 +294,7 @@ export default function PatientInfoSheet({ regimen }: PatientInfoSheetProps) {
         </section>
       )}
 
-      {/* Source reference */}
+      {/* ── SOURCE REFERENCE ──────────────────────────────────── */}
       {regimen.sourceReference && (
         <div className="my-6 text-xs text-gray-400 flex items-start gap-1.5 border-t pt-4">
           <BookOpen size={12} className="mt-0.5 shrink-0" />
@@ -222,7 +302,7 @@ export default function PatientInfoSheet({ regimen }: PatientInfoSheetProps) {
         </div>
       )}
 
-      {/* Dynamic contact footer */}
+      {/* ── DYNAMIC CONTACT FOOTER ────────────────────────────── */}
       <ContactFooter />
     </article>
   );

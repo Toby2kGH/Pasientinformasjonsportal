@@ -74,10 +74,26 @@ export function alertUrgencyColor(urgency: AlertUrgency): string {
   return colors[urgency];
 }
 
+/** Escape HTML special characters to prevent XSS */
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/**
+ * Converts a small subset of Markdown to safe HTML.
+ * Input is HTML-escaped first to prevent XSS, then only
+ * our own controlled tags (**bold**, *italic*, newlines) are injected.
+ */
 export function formatMarkdown(text: string): string {
-  return text
+  return escapeHtml(text)
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n\n/g, '</p><p class="mt-3">')
+    .replace(/\n- /g, '</li><li>')
     .replace(/\n/g, '<br />');
 }

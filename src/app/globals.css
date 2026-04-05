@@ -1,4 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+/*
+ * GDPR-merknad: Google Fonts CDN fjernet.
+ * Fonter lastes ned og serveres lokalt fra /public/fonts/
+ * for å unngå overføring av IP-adresser til tredjeparter
+ * (GDPR art. 9 — sensitive helseopplysninger).
+ *
+ * Fallback: system-serif / system-sans brukes til fontene er lastet.
+ */
 
 @tailwind base;
 @tailwind components;
@@ -57,32 +64,45 @@ h1, h2, h3, h4 {
     margin-bottom: 20pt;
   }
 
-  /* Contact footer always visible in print */
+  /* Contact footer: NOT fixed (causes overlap) — flows naturally at end of content */
   .print-contact-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
     border-top: 1.5pt solid #1E3A5F;
-    padding: 8pt 20pt;
-    background: #fff;
+    padding-top: 8pt;
+    margin-top: 16pt;
     font-size: 9pt;
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
-  /* Ensure alert box is never cut */
+  /* Ensure alert box is never cut across pages */
   .alert-box {
     page-break-inside: avoid;
     break-inside: avoid;
   }
 
-  /* Add page margins */
-  @page {
-    margin: 20mm 15mm 30mm 15mm;
+  /* Section headings stay with their content */
+  h2 {
+    page-break-after: avoid;
+    break-after: avoid;
   }
 
-  /* Links: show URL */
+  /* Page margins — bottom is larger to give room for footer */
+  @page {
+    margin: 20mm 15mm 20mm 15mm;
+  }
+
+  /* Links: do NOT show URL (clutters medical docs) */
   a[href]:after {
     content: none;
+  }
+
+  /* Print metadata bar at top of every page (via CSS counters) */
+  @page {
+    @bottom-right {
+      content: "Side " counter(page) " av " counter(pages);
+      font-size: 8pt;
+      color: #666;
+    }
   }
 }
 
