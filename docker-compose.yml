@@ -6,8 +6,9 @@ services:
       POSTGRES_USER: kreftinfo
       POSTGRES_PASSWORD: kreftinfo
       POSTGRES_DB: kreftinfo
-    ports:
-      - "5432:5432"
+    # DB port NOT exposed externally — only pgbouncer is exposed
+    expose:
+      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -15,6 +16,28 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # PgBouncer — connection pooler
+  # Prevents "too many clients" errors under concurrent hospital load.
+  # The app connects to pgbouncer:5432, not postgres directly.
+  pgbouncer:
+    image: bitnami/pgbouncer:1
+    environment:
+      POSTGRESQL_HOST: db
+      POSTGRESQL_PORT: 5432
+      POSTGRESQL_USERNAME: kreftinfo
+      POSTGRESQL_PASSWORD: kreftinfo
+      POSTGRESQL_DATABASE: kreftinfo
+      PGBOUNCER_DATABASE: kreftinfo
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_MAX_CLIENT_CONN: 200
+      PGBOUNCER_DEFAULT_POOL_SIZE: 20
+      PGBOUNCER_MIN_POOL_SIZE: 5
+    ports:
+      - "5432:5432"
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   postgres_data:

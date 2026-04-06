@@ -1,0 +1,37 @@
+{
+  "name": "KreftInfo Norge",
+  "short_name": "KreftInfo",
+  "description": "Nasjonal pasientinformasjonsportal for kreftbehandling",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFBFC",
+  "theme_color": "#1E3A5F",
+  "lang": "nb",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["medical", "health"],
+  "shortcuts": [
+    {
+      "name": "Søk kurer",
+      "url": "/?focus=search",
+      "description": "Søk etter behandlingsregimer"
+    },
+    {
+      "name": "Innstillinger",
+      "url": "/innstillinger",
+      "description": "Velg favoritt-sykehus"
+    }
+  ]
+}

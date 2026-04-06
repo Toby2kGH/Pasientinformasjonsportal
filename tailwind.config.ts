@@ -16,10 +16,9 @@ const config: Config = {
         'text-primary': '#1A1D23',
       },
       fontFamily: {
-        // Fonts served locally — see public/fonts/ and next/font setup in layout.tsx
-        // Google Fonts CDN removed for GDPR compliance (avoids IP transfer to Google)
-        serif: ['"Source Serif 4"', 'Georgia', '"Times New Roman"', 'serif'],
-        sans: ['"IBM Plex Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        // next/font/google variables injected on <html> — served from same origin at build time
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
       },
     },
   },

@@ -1,17 +1,47 @@
 import type { Metadata } from 'next';
+import { Source_Serif_4, IBM_Plex_Sans } from 'next/font/google';
 import './globals.css';
 import { HospitalProvider } from '@/lib/hospital-context';
 import Navigation from '@/components/navigation';
+
+/*
+ * next/font/google downloads fonts at BUILD TIME and serves them from
+ * the same origin — no requests to Google at runtime.
+ * This is GDPR-compliant: no IP addresses leak to third parties.
+ * Ref: https://nextjs.org/docs/app/building-your-application/optimizing/fonts
+ */
+const sourceSerif = Source_Serif_4({
+  subsets: ['latin'],
+  weight: ['300', '400', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-serif',
+  display: 'swap',
+});
+
+const ibmPlexSans = IBM_Plex_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  style: ['normal', 'italic'],
+  variable: '--font-sans',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'KreftInfo Norge — Nasjonal pasientinformasjonsportal',
   description: 'Nasjonalt kvalitetssikret pasientinformasjon om kreftbehandling. Cellegiftkurer, immunterapi og målrettet behandling med lokalt sykehus-branding.',
   keywords: 'kreft, cellegift, immunterapi, pasientinformasjon, onkologi, Norge',
+  manifest: '/manifest.json',
+  themeColor: '#1E3A5F',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'KreftInfo Norge',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="nb">
+    <html lang="nb" className={`${sourceSerif.variable} ${ibmPlexSans.variable}`}>
       <body className="min-h-screen bg-background">
         <HospitalProvider>
           <Navigation />

@@ -68,6 +68,7 @@ model Regimen {
   slug                String               @unique
   genericNames        String[]
   brandNames          String[]
+  synonyms            String[]             // Ekstra søketermer: ATC-koder, forkortelser, alternative stavemåter
   tumorGroup          TumorGroup           @relation(fields: [tumorGroupId], references: [id])
   tumorGroupId        String
   treatmentType       TreatmentType
@@ -79,9 +80,15 @@ model Regimen {
   alertInstructions   AlertInstruction[]
   premedication       Premedication[]
   isActive            Boolean              @default(true)
+  publishStatus       PublishStatus        @default(DRAFT)
+  publishedAt         DateTime?
   sortOrder           Int                  @default(0)
   lastReviewedAt      DateTime?
   lastReviewedBy      String?
+  // Faglig godkjenning — to godkjennere kreves (fireøyeprinsipp)
+  approvedByFirst     String?
+  approvedBySecond    String?
+  approvedAt          DateTime?
   sourceReference     String?
   cytodoseCode        String?
   version             Int                  @default(1)
@@ -90,6 +97,14 @@ model Regimen {
 
   @@index([tumorGroupId])
   @@index([slug])
+  @@index([publishStatus])
+}
+
+enum PublishStatus {
+  DRAFT            // Arbeidsversjon — ikke synlig for brukere
+  PENDING_REVIEW   // Sendt til faglig gjennomgang
+  APPROVED         // Godkjent av to fagpersoner — publisert
+  ARCHIVED         // Utdatert — ikke synlig, beholdt for historikk
 }
 
 enum TreatmentType {
