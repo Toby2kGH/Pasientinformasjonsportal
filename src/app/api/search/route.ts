@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma, publicRegimenWhere } from '@/lib/prisma';
 import { treatmentTypeLabel } from '@/lib/utils';
 
 // Simple in-memory rate limiter: max 30 requests per IP per minute
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     // tsvector column not yet available — fall back to ILIKE
     regimens = await prisma.regimen.findMany({
       where: {
-        isActive: true,
+        ...publicRegimenWhere,
         OR: [
           { name: { contains: expanded, mode: 'insensitive' } },
           { genericNames: { hasSome: expanded.split(/\s+/) } },
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
   // Fetch tumor groups for matched regimens
   const ids = regimens.map((r) => r.id);
   const full = await prisma.regimen.findMany({
-    where: { id: { in: ids } },
+    where: { id: { in: ids }, ...publicRegimenWhere },
     include: { tumorGroup: true },
     take: 10,
   });

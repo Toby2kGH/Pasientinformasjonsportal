@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma, publicRegimenWhere } from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const regimens = await prisma.regimen.findMany({
-    where: { isActive: true },
+    where: publicRegimenWhere,
     orderBy: [{ tumorGroupId: 'asc' }, { sortOrder: 'asc' }, { name: 'asc' }],
     include: { tumorGroup: true },
   });

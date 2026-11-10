@@ -19,7 +19,8 @@ export interface SelectedHospital {
 
 interface HospitalContextType {
   selected: SelectedHospital | null;
-  setSelected: (h: SelectedHospital | null) => void;
+  /** persist=true also stores the choice as the user's favourite. */
+  setSelected: (h: SelectedHospital | null, persist?: boolean) => void;
 }
 
 const HospitalContext = createContext<HospitalContextType>({
@@ -39,8 +40,9 @@ export function HospitalProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, []);
 
-  function setSelected(h: SelectedHospital | null) {
+  function setSelected(h: SelectedHospital | null, persist = true) {
     setSelectedState(h);
+    if (!persist) return;
     if (h) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(h));
     } else {

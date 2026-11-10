@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
+import { prisma, publicRegimenWhere } from '@/lib/prisma';
 import TumorGroupCard from '@/components/tumor-group-card';
 import SearchBar from '@/components/search-bar';
 
@@ -8,7 +8,7 @@ export const revalidate = 3600;
 export default async function HomePage() {
   const tumorGroups = await prisma.tumorGroup.findMany({
     orderBy: { sortOrder: 'asc' },
-    include: { _count: { select: { regimens: { where: { isActive: true } } } } },
+    include: { _count: { select: { regimens: { where: publicRegimenWhere } } } },
   });
 
   const totalRegimens = tumorGroups.reduce((sum, tg) => sum + tg._count.regimens, 0);

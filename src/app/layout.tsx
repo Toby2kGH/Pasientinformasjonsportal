@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Source_Serif_4, IBM_Plex_Sans } from 'next/font/google';
 import './globals.css';
 import { HospitalProvider } from '@/lib/hospital-context';
@@ -26,12 +26,15 @@ const ibmPlexSans = IBM_Plex_Sans({
   display: 'swap',
 });
 
+export const viewport: Viewport = {
+  themeColor: '#1E3A5F',
+};
+
 export const metadata: Metadata = {
   title: 'KreftInfo Norge — Nasjonal pasientinformasjonsportal',
   description: 'Nasjonalt kvalitetssikret pasientinformasjon om kreftbehandling. Cellegiftkurer, immunterapi og målrettet behandling med lokalt sykehus-branding.',
   keywords: 'kreft, cellegift, immunterapi, pasientinformasjon, onkologi, Norge',
   manifest: '/manifest.json',
-  themeColor: '#1E3A5F',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',

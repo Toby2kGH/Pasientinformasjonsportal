@@ -187,6 +187,7 @@ async function main() {
     { name: 'Lymfom og leukemi', slug: 'lymfom', description: 'Hodgkin lymfom, non-Hodgkin lymfom, kronisk lymfatisk leukemi', iconName: 'droplet', sortOrder: 8 },
     { name: 'Hjernesvulst', slug: 'hjerne', description: 'Glioblastom, astrocytom, oligodendrogliom og andre CNS-svulster', iconName: 'brain', sortOrder: 9 },
     { name: 'Sarkom', slug: 'sarkom', description: 'Bløtvevssarkom og bensarkom', iconName: 'bone', sortOrder: 10 },
+    { name: 'Barnekreft', slug: 'barn', description: 'Krefttyper som primært rammer barn og unge', iconName: 'baby', sortOrder: 11 },
   ];
 
   const tumorGroups: Record<string, string> = {};
@@ -233,6 +234,12 @@ async function main() {
         lastReviewedAt: new Date('2024-01-15'),
         lastReviewedBy: 'Nasjonal faggruppe onkologi',
         version: 1,
+        // Demo content is pre-approved so the prototype shows regimens; real content must go through the admin workflow.
+        publishStatus: 'APPROVED',
+        publishedAt: new Date('2024-01-15'),
+        approvedByFirst: 'Demo-godkjenner 1 (onkolog)',
+        approvedBySecond: 'Demo-godkjenner 2 (farmasøyt)',
+        approvedAt: new Date('2024-01-15'),
         patientInfoSections: { create: data.sections.map((s, i) => ({ ...s, sortOrder: s.sortOrder ?? i })) },
         sideEffects: { create: data.sideEffects.map((s, i) => ({ ...s, sortOrder: s.sortOrder ?? i })) },
         alertInstructions: { create: data.alertInstructions.map((a, i) => ({ ...a, sortOrder: a.sortOrder ?? i })) },
@@ -338,7 +345,7 @@ async function main() {
       { urgency: AlertUrgency.URGENT, instruction: 'Sterk diare (≥6 løse avføringer per dag) eller blodig avføring', action: 'Kontakt onkologisk poliklinikk eller akuttmottak' },
       { urgency: AlertUrgency.URGENT, instruction: 'Kraftig oppkast som ikke lindres av kvalmestillende', action: 'Kontakt onkologisk poliklinikk' },
       { urgency: AlertUrgency.URGENT, instruction: 'Problemer med pumpe eller venøs tilgang (lekkasje, smerte, hevelse)', action: 'Kontakt onkologisk poliklinikk i åpningstiden, akuttmottak utenom' },
-      { urgency: AlertUrgency.SOON, instruction: 'Tiltagende nummenhet/prikking i fingre/tær som påvirker funksjon', action: 'Meld fra ved neste time — dosejustering kan være nødvendig' },
+      { urgency: AlertUrgency.ROUTINE, instruction: 'Tiltagende nummenhet/prikking i fingre/tær som påvirker funksjon', action: 'Meld fra ved neste time — dosejustering kan være nødvendig' },
     ],
     premedication: [
       { medication: 'Ondansetron 8 mg iv', timing: '30 min før behandling', isRequired: true },
@@ -405,7 +412,7 @@ async function main() {
       { urgency: AlertUrgency.EMERGENCY, instruction: 'Feber ≥38,3 °C eller frostrier', action: 'Kontakt akuttmottak umiddelbart. Stopp tablettene.' },
       { urgency: AlertUrgency.URGENT, instruction: 'Mer enn 4 løse avføringer per dag', action: 'Kontakt onkologisk poliklinikk. Stopp tablettene midlertidig.' },
       { urgency: AlertUrgency.URGENT, instruction: 'Alvorlig hånd-fot-syndrom med smerter som hindrer normal aktivitet', action: 'Kontakt onkologisk poliklinikk. Stopp tablettene.' },
-      { urgency: AlertUrgency.SOON, instruction: 'Brystsmerter eller hjerterytmeforstyrrelser', action: 'Kontakt lege — sjelden, men kapecitabin kan påvirke hjertet' },
+      { urgency: AlertUrgency.EMERGENCY, instruction: 'Brystsmerter eller hjerterytmeforstyrrelser', action: 'Stopp tablettene. Ring 113 eller kontakt akuttmottak umiddelbart — kapecitabin kan i sjeldne tilfeller påvirke hjertet' },
     ],
     premedication: [],
   });

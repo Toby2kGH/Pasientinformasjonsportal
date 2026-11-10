@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
+import { prisma, publicRegimenWhere } from '@/lib/prisma';
+import { regimenDetailInclude } from '@/lib/regimen-query';
 import PatientInfoSheet from '@/components/patient-info-sheet';
 import HospitalSelector from '@/components/hospital-selector';
 
@@ -11,8 +12,8 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props) {
-  const regimen = await prisma.regimen.findUnique({
-    where: { slug: params.kur },
+  const regimen = await prisma.regimen.findFirst({
+    where: { slug: params.kur, ...publicRegimenWhere },
     include: { tumorGroup: true },
   });
   if (!regimen) return { title: 'Ikke funnet' };
@@ -23,15 +24,9 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function RegimenPage({ params }: Props) {
-  const regimen = await prisma.regimen.findUnique({
-    where: { slug: params.kur },
-    include: {
-      tumorGroup: true,
-      patientInfoSections: { orderBy: { sortOrder: 'asc' } },
-      sideEffects: { orderBy: { sortOrder: 'asc' } },
-      alertInstructions: { orderBy: { sortOrder: 'asc' } },
-      premedication: { orderBy: { sortOrder: 'asc' } },
-    },
+  const regimen = await prisma.regimen.findFirst({
+    where: { slug: params.kur, ...publicRegimenWhere },
+    include: regimenDetailInclude,
   });
 
   if (!regimen || regimen.tumorGroup.slug !== params.tumorgruppe) notFound();
@@ -87,7 +82,7 @@ export default async function RegimenPage({ params }: Props) {
 
 async function OtherRegimens({ tumorGroupId, currentSlug, tumorGroupSlug }: { tumorGroupId: string; currentSlug: string; tumorGroupSlug: string }) {
   const others = await prisma.regimen.findMany({
-    where: { tumorGroupId, isActive: true, NOT: { slug: currentSlug } },
+    where: { tumorGroupId, ...publicRegimenWhere, NOT: { slug: currentSlug } },
     orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
     take: 6,
     select: { name: true, slug: true },

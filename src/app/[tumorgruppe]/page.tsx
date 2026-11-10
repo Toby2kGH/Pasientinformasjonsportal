@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
+import { TreatmentType } from '@prisma/client';
+import { prisma, publicRegimenWhere } from '@/lib/prisma';
 import RegimenCard from '@/components/regimen-card';
-import { Activity, Sun, Wind, Heart, Flower2, Droplets, ScanFace, Droplet, Brain, Bone } from 'lucide-react';
+import { Activity, Sun, Wind, Heart, Flower2, Droplets, ScanFace, Droplet, Brain, Bone, Baby } from 'lucide-react';
 
 export const revalidate = 3600;
 
@@ -17,6 +18,7 @@ const iconMap: Record<string, React.ReactNode> = {
   droplet: <Droplet size={24} />,
   brain: <Brain size={24} />,
   bone: <Bone size={24} />,
+  baby: <Baby size={24} />,
 };
 
 interface Props {
@@ -25,13 +27,14 @@ interface Props {
 }
 
 export default async function TumorGroupPage({ params, searchParams }: Props) {
+  const typeFilter = Object.values(TreatmentType).find((t) => t === searchParams.type);
   const tumorGroup = await prisma.tumorGroup.findUnique({
     where: { slug: params.tumorgruppe },
     include: {
       regimens: {
         where: {
-          isActive: true,
-          ...(searchParams.type ? { treatmentType: searchParams.type as any } : {}),
+          ...publicRegimenWhere,
+          ...(typeFilter ? { treatmentType: typeFilter } : {}),
         },
         orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
       },
@@ -41,7 +44,7 @@ export default async function TumorGroupPage({ params, searchParams }: Props) {
   if (!tumorGroup) notFound();
 
   const allTypes = await prisma.regimen.findMany({
-    where: { tumorGroupId: tumorGroup.id, isActive: true },
+    where: { tumorGroupId: tumorGroup.id, ...publicRegimenWhere },
     select: { treatmentType: true },
     distinct: ['treatmentType'],
   });

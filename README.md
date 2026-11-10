@@ -16,14 +16,15 @@ tilpasset lokalt sykehus-branding.
 # 1. Start PostgreSQL
 docker-compose up -d db
 
-# 2. Installer avhengigheter
+# 2. Installer avhengigheter og lag .env (sett ADMIN_PASSWORD)
 npm install
+cp .env.example .env
 
 # 3. Generer Prisma client
 npx prisma generate
 
-# 4. Kjør migrasjoner
-npx prisma migrate dev --name init
+# 4. Kjør migrasjonene som ligger i repoet
+npx prisma migrate deploy
 
 # 5. Seed databasen
 npx prisma db seed
@@ -37,13 +38,15 @@ npm run dev
 ## Nøkkelfunksjoner
 
 - **15+ kurer** med komplett pasientinformasjon (Temozolomid, BRAF/MEK, FOLFOX, FOLFIRI, Kapecitabin, Pembrolizumab, Nivolumab+Ipilimumab, EC90, Docetaxel, FOLFIRINOX, Gemcitabin+nab-paklitaksel, CAPOX, Karboplatin+Pemetreksed+Pembrolizumab, FLOX, Nivolumab)
-- **16 sykehus** med reell kontaktinformasjon fra alle helseregioner
+- **15 sykehus** med reell kontaktinformasjon fra alle helseregioner
 - **Dynamisk sykehusvelger** — kaskaderende region → sykehus → avdeling
 - **Utskriftsoptimalisert** — sykehuslogo i header, kontaktinfo i footer
+- **PDF-nedlasting** — `/[tumorgruppe]/[kur]/pdf?avdeling=<id>` genererer A4-PDF med sykehusets navn, logo og kontaktinfo på hver side. Kontaktinfo hentes alltid fra databasen.
+- **Publiseringsflyt med fireøyeprinsipp** — kun kurer med status `APPROVED` vises for publikum, i PDF og i søk. Seed-dataene er forhåndsgodkjent for demo.
 - **Varselhierarki** — EMERGENCY/URGENT/SOON/ROUTINE med visuell differensiering
 - **Favorittsystem** — lagres i localStorage
 - **Søk** på kurnavnet, virkestoff og handelsnavn
-- **Admin-prototype** med statistikk og audit-log
+- **Admin-prototype** med statistikk og audit-log. Beskyttet med HTTP Basic auth (`ADMIN_USER` / `ADMIN_PASSWORD` i `.env`); uten satt passord er admin deaktivert. Skal erstattes av HelseID i produksjon.
 
 ## Filstruktur
 

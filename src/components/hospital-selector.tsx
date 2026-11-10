@@ -67,9 +67,9 @@ export default function HospitalSelector({
   const currentHospital = currentRegion?.hospitals.find((h) => h.id === selectedHospitalId);
   const currentDept     = currentHospital?.departments.find((d) => d.id === selectedDeptId);
 
-  function handleConfirm() {
-    if (!currentRegion || !currentHospital || !currentDept) return;
-    const sel: SelectedHospital = {
+  function buildSelection(): SelectedHospital | null {
+    if (!currentRegion || !currentHospital || !currentDept) return null;
+    return {
       regionId: currentRegion.id,
       regionName: currentRegion.name,
       hospitalId: currentHospital.id,
@@ -83,7 +83,20 @@ export default function HospitalSelector({
       openingHours: currentDept.openingHours,
       address: currentDept.address,
     };
-    setSelected(sel);
+  }
+
+  // Apply the choice to this session as soon as a department is picked, so print/PDF
+  // include contact details even if the user never saves it as a favourite.
+  useEffect(() => {
+    const sel = buildSelection();
+    if (sel && sel.departmentId !== selected?.departmentId) setSelected(sel, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentDept?.id]);
+
+  function handleConfirm() {
+    const sel = buildSelection();
+    if (!sel) return;
+    setSelected(sel, true);
     onSelectionChange?.(sel);
     setSaved(true);
     setTimeout(() => {

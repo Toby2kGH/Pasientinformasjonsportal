@@ -56,9 +56,10 @@ export function sideEffectFreqColor(freq: SideEffectFreq): string {
 
 export function alertUrgencyLabel(urgency: AlertUrgency): string {
   const labels: Record<AlertUrgency, string> = {
-    EMERGENCY: 'RING 113',
-    URGENT: 'Kontakt akuttmottak',
-    SOON: 'Kontakt poliklinikk',
+    // Labels state how fast; the instruction's action text states whom to contact.
+    EMERGENCY: 'Straks',
+    URGENT: 'Samme dag',
+    SOON: 'Innen 24 timer',
     ROUTINE: 'Ta opp på neste time',
   };
   return labels[urgency];

@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { SectionType, TreatmentType, AdministrationRoute } from '@prisma/client';
+import { SectionType, TreatmentType, AdministrationRoute, SideEffectFreq, AlertUrgency } from '@prisma/client';
 import { treatmentTypeLabel, treatmentTypeBadgeColor, administrationRouteLabel, formatMarkdown } from '@/lib/utils';
 import AlertBox from './alert-box';
 import SideEffectTable from './side-effect-table';
 import ContactFooter from './contact-footer';
+import PdfGenerator from './pdf-generator';
 import { useHospital } from '@/lib/hospital-context';
 import { Printer, Calendar, User, BookOpen, AlertTriangle } from 'lucide-react';
 
@@ -19,14 +20,14 @@ interface PatientInfoSection {
 interface SideEffect {
   name: string;
   description: string;
-  frequency: any;
+  frequency: SideEffectFreq;
   severity?: string | null;
   management?: string | null;
   sortOrder: number;
 }
 
 interface AlertInstruction {
-  urgency: any;
+  urgency: AlertUrgency;
   instruction: string;
   action: string;
   sortOrder: number;
@@ -42,6 +43,7 @@ interface Premedication {
 
 interface Regimen {
   name: string;
+  slug: string;
   genericNames: string[];
   brandNames: string[];
   treatmentType: TreatmentType;
@@ -102,9 +104,15 @@ export default function PatientInfoSheet({ regimen }: PatientInfoSheetProps) {
       <div className="hidden print:block mb-6 pb-4 border-b-2 border-medical-blue">
         {selected ? (
           <div className="flex items-start justify-between">
-            <div>
+            <div className="flex items-center gap-4">
+              {selected.hospitalLogoUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={selected.hospitalLogoUrl} alt={selected.hospitalName} className="h-12 w-auto" />
+              )}
+              <div>
               <p className="font-serif font-bold text-xl text-medical-blue">{selected.hospitalName}</p>
               <p className="text-gray-600 text-sm">{selected.departmentName}</p>
+              </div>
             </div>
             <div className="text-right text-xs text-gray-500">
               <p>Skrevet ut: {printDate}</p>
@@ -158,6 +166,7 @@ export default function PatientInfoSheet({ regimen }: PatientInfoSheetProps) {
           </div>
         )}
 
+        <div className="flex flex-col sm:flex-row gap-2">
         <button
           onClick={handlePrint}
           className="w-full sm:w-auto flex items-center justify-center gap-2 bg-medical-blue text-white rounded-xl px-6 py-3 font-medium hover:bg-blue-800 transition-colors shadow-sm"
@@ -170,6 +179,8 @@ export default function PatientInfoSheet({ regimen }: PatientInfoSheetProps) {
             </span>
           )}
         </button>
+        <PdfGenerator tumorGroupSlug={regimen.tumorGroup.slug} regimenSlug={regimen.slug} />
+        </div>
         {!selected && (
           <p className="text-xs text-amber-600 mt-1.5 flex items-center gap-1">
             <AlertTriangle size={11} />

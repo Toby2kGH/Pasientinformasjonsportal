@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -11,3 +11,9 @@ export const prisma =
   });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+// Only regimens approved under the four-eyes workflow may be shown to patients.
+export const publicRegimenWhere = {
+  isActive: true,
+  publishStatus: 'APPROVED',
+} satisfies Prisma.RegimenWhereInput;
