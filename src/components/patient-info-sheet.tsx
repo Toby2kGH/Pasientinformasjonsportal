@@ -109,7 +109,7 @@ export default function PatientInfoSheet({ regimen }: PatientInfoSheetProps) {
             <div className="text-right text-xs text-gray-500">
               <p>Skrevet ut: {printDate}</p>
               {regimen.lastReviewedAt && (
-                <p>Faglig gjennomgått: {new Date(regimen.lastReviewedAt).toLocaleDateString('nb-NO', { year: 'numeric', month: 'long' })}</p>
+                <p>Godkjent: {new Date(regimen.lastReviewedAt).toLocaleDateString('nb-NO', { year: 'numeric', month: 'long' })}</p>
               )}
               <p>Versjon {regimen.version}</p>
             </div>
@@ -117,7 +117,7 @@ export default function PatientInfoSheet({ regimen }: PatientInfoSheetProps) {
         ) : (
           <div className="flex items-start justify-between">
             <p className="font-serif font-bold text-xl text-gray-500 italic">
-              [Sykehus ikke valgt — se kreftinfo.no]
+              [Sykehus ikke valgt]
             </p>
             <div className="text-right text-xs text-gray-500">
               <p>Skrevet ut: {printDate}</p>
@@ -232,7 +232,7 @@ export default function PatientInfoSheet({ regimen }: PatientInfoSheetProps) {
           {regimen.lastReviewedAt && (
             <span className="flex items-center gap-1">
               <Calendar size={12} />
-              Sist gjennomgått: {new Date(regimen.lastReviewedAt).toLocaleDateString('nb-NO', { year: 'numeric', month: 'long' })}
+              Godkjent: {new Date(regimen.lastReviewedAt).toLocaleDateString('nb-NO', { year: 'numeric', month: 'long' })}
             </span>
           )}
           {regimen.lastReviewedBy && (

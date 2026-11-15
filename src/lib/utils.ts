@@ -56,10 +56,12 @@ export function sideEffectFreqColor(freq: SideEffectFreq): string {
 
 export function alertUrgencyLabel(urgency: AlertUrgency): string {
   const labels: Record<AlertUrgency, string> = {
-    EMERGENCY: 'RING 113',
-    URGENT: 'Kontakt akuttmottak',
-    SOON: 'Kontakt poliklinikk',
-    ROUTINE: 'Ta opp på neste time',
+    // Merkelappen angir bare hvor mye det haster. Hva pasienten skal gjøre
+    // (ringe avdelingen, akuttmottaket eller 113) står i teksten til hvert varsel.
+    EMERGENCY: 'Akutt',
+    URGENT: 'Haster',
+    SOON: 'Snart',
+    ROUTINE: 'Ved neste time',
   };
   return labels[urgency];
 }

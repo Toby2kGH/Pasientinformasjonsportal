@@ -11,3 +11,10 @@ export const prisma =
   });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+/**
+ * Filter for innhold som kan vises offentlig: bare kurer som har gått gjennom
+ * godkjenningsflyten (to godkjennere) og ikke er arkivert. Brukes i ALLE
+ * offentlige spørringer, så utkast og arkiverte kurer aldri vises eller skrives ut.
+ */
+export const PUBLISHED = { isActive: true, publishStatus: 'APPROVED' } as const;

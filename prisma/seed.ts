@@ -1,4 +1,4 @@
-import { PrismaClient, TreatmentType, AdministrationRoute, SectionType, SideEffectFreq, AlertUrgency } from '@prisma/client';
+import { PrismaClient, TreatmentType, AdministrationRoute, SectionType, SideEffectFreq, AlertUrgency, PublishStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -167,7 +167,10 @@ async function main() {
       create: { ...hospitalFields, id: hospitalFields.shortName },
     });
     for (const dept of departments) {
-      await prisma.department.create({ data: { ...dept, hospitalId: hospital.id } }).catch(() => {});
+      // Der «akuttnummeret» er det samme som avdelingens nummer, er det ikke et eget
+      // akuttnummer (trolig sentralbord). Vis det da ikke som «Akuttmottak».
+      const emergencyPhone = dept.emergencyPhone !== dept.phoneNumber ? dept.emergencyPhone : null;
+      await prisma.department.create({ data: { ...dept, emergencyPhone, hospitalId: hospital.id } }).catch(() => {});
     }
   }
 
@@ -205,6 +208,16 @@ async function main() {
   // KURER (REGIMENS)
   // ============================================================
 
+  // DEMO: De fleste kurene legges inn som «godkjent» av to demobrukere, så
+  // offentlige sider har innhold. Tre kurer ligger igjen i godkjenningsflyten,
+  // så flyten kan vises i redaksjonsverktøyet. Ingen av tekstene er faglig vurdert.
+  const demoWorkflow: Record<string, { status: PublishStatus; first?: string }> = {
+    'flox': { status: PublishStatus.DRAFT },
+    'nivolumab': { status: PublishStatus.PENDING_REVIEW },
+    'karboplatin-pemetreksed-pembrolizumab': { status: PublishStatus.PENDING_REVIEW, first: 'Demobruker A' },
+  };
+  const seededAt = new Date();
+
   // Helper
   async function createRegimen(data: {
     name: string; slug: string; genericNames: string[]; brandNames: string[];
@@ -218,6 +231,9 @@ async function main() {
     const existing = await prisma.regimen.findUnique({ where: { slug: data.slug } });
     if (existing) return existing;
 
+    const wf = demoWorkflow[data.slug] ?? { status: PublishStatus.APPROVED };
+    const approved = wf.status === PublishStatus.APPROVED;
+
     return prisma.regimen.create({
       data: {
         name: data.name,
@@ -230,8 +246,13 @@ async function main() {
         cycleDescription: data.cycleDescription,
         numberOfCycles: data.numberOfCycles,
         sourceReference: data.sourceReference,
-        lastReviewedAt: new Date('2024-01-15'),
-        lastReviewedBy: 'Nasjonal faggruppe onkologi',
+        publishStatus: wf.status,
+        approvedByFirst: approved ? 'Demobruker A' : wf.first ?? null,
+        approvedBySecond: approved ? 'Demobruker B' : null,
+        approvedAt: approved ? seededAt : null,
+        publishedAt: approved ? seededAt : null,
+        lastReviewedAt: approved ? seededAt : null,
+        lastReviewedBy: approved ? 'Demogodkjent – ikke faglig vurdert' : null,
         version: 1,
         patientInfoSections: { create: data.sections.map((s, i) => ({ ...s, sortOrder: s.sortOrder ?? i })) },
         sideEffects: { create: data.sideEffects.map((s, i) => ({ ...s, sortOrder: s.sortOrder ?? i })) },

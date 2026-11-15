@@ -28,7 +28,7 @@ export default function Navigation() {
               <Link href="/" className="hover:text-blue-200 transition-colors">Forside</Link>
               <Link href="/#tumorgrupper" className="hover:text-blue-200 transition-colors">Tumorgrupper</Link>
               <Link href="/innstillinger" className="hover:text-blue-200 transition-colors">Innstillinger</Link>
-              <Link href="/admin" className="hover:text-blue-200 transition-colors">Admin</Link>
+              <Link href="/admin" prefetch={false} className="hover:text-blue-200 transition-colors">Admin</Link>
             </div>
 
             {/* Right side */}
@@ -65,7 +65,7 @@ export default function Navigation() {
               <Link href="/" className="block px-2 py-1.5 hover:bg-white/10 rounded" onClick={() => setMenuOpen(false)}>Forside</Link>
               <Link href="/#tumorgrupper" className="block px-2 py-1.5 hover:bg-white/10 rounded" onClick={() => setMenuOpen(false)}>Tumorgrupper</Link>
               <Link href="/innstillinger" className="block px-2 py-1.5 hover:bg-white/10 rounded" onClick={() => setMenuOpen(false)}>Innstillinger</Link>
-              <Link href="/admin" className="block px-2 py-1.5 hover:bg-white/10 rounded" onClick={() => setMenuOpen(false)}>Admin</Link>
+              <Link href="/admin" prefetch={false} className="block px-2 py-1.5 hover:bg-white/10 rounded" onClick={() => setMenuOpen(false)}>Admin</Link>
             </div>
           )}
         </div>

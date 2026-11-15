@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
+import { prisma, PUBLISHED } from '@/lib/prisma';
 import RegimenCard from '@/components/regimen-card';
 import { Activity, Sun, Wind, Heart, Flower2, Droplets, ScanFace, Droplet, Brain, Bone } from 'lucide-react';
 
@@ -30,7 +30,7 @@ export default async function TumorGroupPage({ params, searchParams }: Props) {
     include: {
       regimens: {
         where: {
-          isActive: true,
+          ...PUBLISHED,
           ...(searchParams.type ? { treatmentType: searchParams.type as any } : {}),
         },
         orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
@@ -41,7 +41,7 @@ export default async function TumorGroupPage({ params, searchParams }: Props) {
   if (!tumorGroup) notFound();
 
   const allTypes = await prisma.regimen.findMany({
-    where: { tumorGroupId: tumorGroup.id, isActive: true },
+    where: { tumorGroupId: tumorGroup.id, ...PUBLISHED },
     select: { treatmentType: true },
     distinct: ['treatmentType'],
   });

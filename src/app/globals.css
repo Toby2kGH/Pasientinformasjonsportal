@@ -40,6 +40,16 @@ h1, h2, h3, h4 {
     display: none !important;
   }
 
+  /* Demo-merking skal alltid med på papiret */
+  .demo-banner {
+    display: block !important;
+    border: 2pt solid #000;
+    background: #fff !important;
+    color: #000 !important;
+    font-weight: 700;
+    margin-bottom: 10pt;
+  }
+
   /* Show print-only elements */
   .print-only {
     display: block !important;

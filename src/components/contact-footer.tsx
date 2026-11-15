@@ -58,9 +58,6 @@ export default function ContactFooter() {
             </div>
           )}
         </div>
-        <p className="text-xs text-gray-400 mt-3">
-          Kilder: kreftlex.no | felleskatalogen.no | nasjonale handlingsprogrammer (Helsedirektoratet)
-        </p>
       </div>
     </div>
   );
