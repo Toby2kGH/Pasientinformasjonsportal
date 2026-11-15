@@ -92,12 +92,15 @@ model Regimen {
   sourceReference     String?
   cytodoseCode        String?
   version             Int                  @default(1)
+  // Fulltekstsøk — fylles av databasetrigger (se migrasjon workflow_and_fts)
+  searchVector        Unsupported("tsvector")?
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
 
   @@index([tumorGroupId])
   @@index([slug])
   @@index([publishStatus])
+  @@index([searchVector], type: Gin)
 }
 
 enum PublishStatus {

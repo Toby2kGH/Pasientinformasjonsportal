@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   const regimens = await prisma.regimen.findMany({
-    where: { isActive: true },
+    where: { isActive: true, publishStatus: 'APPROVED' },
     orderBy: [{ tumorGroupId: 'asc' }, { sortOrder: 'asc' }, { name: 'asc' }],
     include: { tumorGroup: true },
   });

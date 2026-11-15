@@ -22,9 +22,9 @@ ALTER TABLE "Regimen" ADD COLUMN IF NOT EXISTS "searchVector" tsvector;
 -- Build initial vectors
 UPDATE "Regimen" SET "searchVector" =
   setweight(to_tsvector('norwegian', coalesce("name", '')), 'A') ||
-  setweight(to_tsvector('simple',    array_to_string("genericNames", ' ')), 'B') ||
-  setweight(to_tsvector('simple',    array_to_string("brandNames", ' ')), 'B') ||
-  setweight(to_tsvector('simple',    array_to_string("synonyms", ' ')), 'B');
+  setweight(to_tsvector('simple',    coalesce(array_to_string("genericNames", ' '), '')), 'B') ||
+  setweight(to_tsvector('simple',    coalesce(array_to_string("brandNames", ' '), '')), 'B') ||
+  setweight(to_tsvector('simple',    coalesce(array_to_string("synonyms", ' '), '')), 'B');
 
 -- GIN index for fast full-text search
 CREATE INDEX IF NOT EXISTS "Regimen_searchVector_idx" ON "Regimen" USING GIN("searchVector");
@@ -35,9 +35,9 @@ CREATE OR REPLACE FUNCTION regimen_search_vector_update() RETURNS trigger AS $$
 BEGIN
   NEW."searchVector" :=
     setweight(to_tsvector('norwegian', coalesce(NEW."name", '')), 'A') ||
-    setweight(to_tsvector('simple',    array_to_string(NEW."genericNames", ' ')), 'B') ||
-    setweight(to_tsvector('simple',    array_to_string(NEW."brandNames", ' ')), 'B') ||
-    setweight(to_tsvector('simple',    array_to_string(NEW."synonyms", ' ')), 'B');
+    setweight(to_tsvector('simple',    coalesce(array_to_string(NEW."genericNames", ' '), '')), 'B') ||
+    setweight(to_tsvector('simple',    coalesce(array_to_string(NEW."brandNames", ' '), '')), 'B') ||
+    setweight(to_tsvector('simple',    coalesce(array_to_string(NEW."synonyms", ' '), '')), 'B');
   RETURN NEW;
 END
 $$ LANGUAGE plpgsql;

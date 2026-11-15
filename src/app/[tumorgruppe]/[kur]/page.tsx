@@ -38,6 +38,11 @@ export default async function RegimenPage({ params }: Props) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      {regimen.publishStatus !== 'APPROVED' && (
+        <div role="alert" className="mb-6 bg-amber-50 border border-amber-300 text-amber-900 rounded-xl p-4 text-sm font-medium">
+          Forhåndsvisning — denne kuren er ikke publisert og skal ikke gis til pasienter.
+        </div>
+      )}
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2 no-print">
         <Link href="/" className="hover:text-medical-blue">Forside</Link>
@@ -87,7 +92,7 @@ export default async function RegimenPage({ params }: Props) {
 
 async function OtherRegimens({ tumorGroupId, currentSlug, tumorGroupSlug }: { tumorGroupId: string; currentSlug: string; tumorGroupSlug: string }) {
   const others = await prisma.regimen.findMany({
-    where: { tumorGroupId, isActive: true, NOT: { slug: currentSlug } },
+    where: { tumorGroupId, isActive: true, publishStatus: 'APPROVED', NOT: { slug: currentSlug } },
     orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
     take: 6,
     select: { name: true, slug: true },

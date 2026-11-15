@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
     regimens = await prisma.regimen.findMany({
       where: {
         isActive: true,
+        publishStatus: 'APPROVED',
         OR: [
           { name: { contains: expanded, mode: 'insensitive' } },
           { genericNames: { hasSome: expanded.split(/\s+/) } },

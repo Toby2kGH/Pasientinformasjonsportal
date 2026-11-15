@@ -8,7 +8,7 @@ export const revalidate = 3600;
 export default async function HomePage() {
   const tumorGroups = await prisma.tumorGroup.findMany({
     orderBy: { sortOrder: 'asc' },
-    include: { _count: { select: { regimens: { where: { isActive: true } } } } },
+    include: { _count: { select: { regimens: { where: { isActive: true, publishStatus: 'APPROVED' } } } } },
   });
 
   const totalRegimens = tumorGroups.reduce((sum, tg) => sum + tg._count.regimens, 0);

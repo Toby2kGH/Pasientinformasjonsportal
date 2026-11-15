@@ -31,6 +31,7 @@ export default async function TumorGroupPage({ params, searchParams }: Props) {
       regimens: {
         where: {
           isActive: true,
+          publishStatus: 'APPROVED',
           ...(searchParams.type ? { treatmentType: searchParams.type as any } : {}),
         },
         orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
@@ -41,7 +42,7 @@ export default async function TumorGroupPage({ params, searchParams }: Props) {
   if (!tumorGroup) notFound();
 
   const allTypes = await prisma.regimen.findMany({
-    where: { tumorGroupId: tumorGroup.id, isActive: true },
+    where: { tumorGroupId: tumorGroup.id, isActive: true, publishStatus: 'APPROVED' },
     select: { treatmentType: true },
     distinct: ['treatmentType'],
   });

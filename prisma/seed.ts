@@ -230,8 +230,10 @@ async function main() {
         cycleDescription: data.cycleDescription,
         numberOfCycles: data.numberOfCycles,
         sourceReference: data.sourceReference,
-        lastReviewedAt: new Date('2024-01-15'),
-        lastReviewedBy: 'Nasjonal faggruppe onkologi',
+        // Demo-innhold: publisert for at prototypen skal vise noe, men IKKE faglig godkjent.
+        // Ingen gjennomgangsdato eller godkjenner settes — det ville vist falsk kvalitetssikring.
+        publishStatus: 'APPROVED',
+        publishedAt: new Date(),
         version: 1,
         patientInfoSections: { create: data.sections.map((s, i) => ({ ...s, sortOrder: s.sortOrder ?? i })) },
         sideEffects: { create: data.sideEffects.map((s, i) => ({ ...s, sortOrder: s.sortOrder ?? i })) },

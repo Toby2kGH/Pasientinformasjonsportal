@@ -23,7 +23,7 @@ npm install
 npx prisma generate
 
 # 4. Kjør migrasjoner
-npx prisma migrate dev --name init
+npx prisma migrate deploy
 
 # 5. Seed databasen
 npx prisma db seed
@@ -70,6 +70,5 @@ src/
 
 - Erstatt SVG-placeholder-logoer med ekte sykehuslogoer i `public/logos/`
 - Aktiver HelseID/Helsenorge-autentisering
-- Legg til full-text search via PostgreSQL `tsvector`
 - Implementer full CRUD i admin-grensesnittet
 - Konfigurer caching-strategi (ISR/CDN)
