@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Source_Serif_4, IBM_Plex_Sans } from 'next/font/google';
 import './globals.css';
 import { HospitalProvider } from '@/lib/hospital-context';
@@ -28,10 +28,9 @@ const ibmPlexSans = IBM_Plex_Sans({
 
 export const metadata: Metadata = {
   title: 'KreftInfo Norge — Nasjonal pasientinformasjonsportal',
-  description: 'Nasjonalt kvalitetssikret pasientinformasjon om kreftbehandling. Cellegiftkurer, immunterapi og målrettet behandling med lokalt sykehus-branding.',
+  description: 'Demo av en nasjonal pasientinformasjonsportal for kreftbehandling. Innholdet er eksempeltekst og er ikke faglig kvalitetssikret.',
   keywords: 'kreft, cellegift, immunterapi, pasientinformasjon, onkologi, Norge',
   manifest: '/manifest.json',
-  themeColor: '#1E3A5F',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -39,11 +38,22 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: '#1E3A5F',
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="nb" className={`${sourceSerif.variable} ${ibmPlexSans.variable}`}>
       <body className="min-h-screen bg-background">
         <HospitalProvider>
+          {/* Demo-merking: vises på alle sider og kommer med på utskrift */}
+          <div
+            role="note"
+            className="demo-banner bg-amber-300 text-amber-950 text-sm text-center px-4 py-2 font-medium"
+          >
+            DEMO – eksempelinnhold som ikke er faglig kvalitetssikret. Skal ikke gis til pasienter.
+          </div>
           <Navigation />
           <main className="min-h-screen">
             {children}
@@ -54,8 +64,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <div>
                   <h3 className="font-serif font-semibold text-lg mb-2">KreftInfo Norge</h3>
                   <p className="text-blue-200 text-sm">
-                    Nasjonal pasientinformasjonsportal for kreftbehandling. Innholdet er faglig
-                    kvalitetssikret og oppdatert i henhold til nasjonale handlingsprogrammer.
+                    Demo av en nasjonal pasientinformasjonsportal for kreftbehandling.
+                    Innholdet er eksempeltekst og er ikke faglig kvalitetssikret.
                   </p>
                 </div>
                 <div>
@@ -77,7 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </div>
               </div>
               <div className="border-t border-blue-700 mt-8 pt-4 text-center text-blue-300 text-xs">
-                © {new Date().getFullYear()} KreftInfo Norge — Prototype. Ikke for klinisk bruk uten faglig godkjenning.
+                © {new Date().getFullYear()} KreftInfo Norge — Demo. Ikke til bruk med pasienter.
               </div>
             </div>
           </footer>

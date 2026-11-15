@@ -1,7 +1,15 @@
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 import { writeAuditLog } from '@/lib/audit';
+import { checkAdminAuth } from '@/lib/admin-auth';
+
+/** Samme person skal ikke kunne godkjenne to ganger ved å endre store/små bokstaver eller mellomrom. */
+function samePerson(a: string, b: string): boolean {
+  const norm = (x: string) => x.trim().replace(/\s+/g, ' ').toLocaleLowerCase('nb-NO');
+  return norm(a) === norm(b);
+}
 
 /**
  * POST /api/admin/approve
@@ -13,10 +21,15 @@ import { writeAuditLog } from '@/lib/audit';
  *   PENDING_REVIEW + approvedByFirst → second → APPROVED
  *   APPROVED → archive → ARCHIVED
  *
- * NOTE: In production the `approver` identity must come from HelseID session,
- * not from the request body. This is a prototype demo.
+ * Beskyttet av Basic Auth (middleware + sjekk her). Godkjenners navn er fortsatt
+ * fritekst i demoen. Nasjonal drift krever identitet fra HelseID.
  */
 export async function POST(request: NextRequest) {
+  // Dobbel sikring: ikke stol bare på middleware
+  if (checkAdminAuth(request.headers.get('authorization')) !== 'ok') {
+    return NextResponse.json({ error: 'Ikke autorisert' }, { status: 401 });
+  }
+
   let body: { regimenId: string; step: string; approver: string };
   try {
     body = await request.json();
@@ -54,7 +67,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Kuren er ikke til gjennomgang' }, { status: 400 });
       if (!regimen.approvedByFirst)
         return NextResponse.json({ error: 'Første godkjenner mangler' }, { status: 400 });
-      if (regimen.approvedByFirst === approver.trim())
+      if (samePerson(regimen.approvedByFirst, approver))
         return NextResponse.json(
           { error: 'Fireøyeprinsipp: samme person kan ikke være begge godkjennere' },
           { status: 400 }
@@ -79,6 +92,10 @@ export async function POST(request: NextRequest) {
   }
 
   const updated = await prisma.regimen.update({ where: { id: regimenId }, data: update });
+
+  // Offentlige sider er bufret i inntil en time. Tøm bufferen så en arkivert
+  // kur forsvinner, og en nylig godkjent kur vises, med en gang.
+  revalidatePath('/', 'layout');
 
   writeAuditLog('Regimen', regimenId, `WORKFLOW_${step.toUpperCase()}`, approver.trim(), {
     from: regimen.publishStatus,

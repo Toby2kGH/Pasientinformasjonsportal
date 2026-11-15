@@ -51,7 +51,7 @@ export default function RegimenCard({
 
       {lastReviewedAt && (
         <p className="text-xs text-gray-400 mt-2">
-          Sist gjennomgått: {new Date(lastReviewedAt).toLocaleDateString('nb-NO', { year: 'numeric', month: 'long' })}
+          Godkjent: {new Date(lastReviewedAt).toLocaleDateString('nb-NO', { year: 'numeric', month: 'long' })}
         </p>
       )}
     </Link>

@@ -44,7 +44,7 @@ export default async function AdminPage() {
       <div className="mb-8">
         <h1 className="font-serif text-3xl font-bold text-gray-900 mb-1">Redaksjonsverktøy</h1>
         <p className="text-gray-500 text-sm">
-          Godkjenningsworkflow for kurinnhold. Produksjon krever HelseID-autentisering.
+          Godkjenningsflyt for kurinnhold. Bare godkjente kurer vises offentlig. Demo: navn i fritekst, ingen personlig innlogging. Nasjonal drift krever HelseID.
         </p>
       </div>
 
@@ -97,12 +97,16 @@ export default async function AdminPage() {
                 {regimens.map((r) => (
                   <tr key={r.id} className="hover:bg-gray-50">
                     <td className="p-3">
-                      <Link
-                        href={`/${r.tumorGroup.slug}/${r.slug}`}
-                        className="font-medium text-medical-blue hover:underline"
-                      >
-                        {r.name}
-                      </Link>
+                      {r.publishStatus === 'APPROVED' ? (
+                        <Link
+                          href={`/${r.tumorGroup.slug}/${r.slug}`}
+                          className="font-medium text-medical-blue hover:underline"
+                        >
+                          {r.name}
+                        </Link>
+                      ) : (
+                        <span className="font-medium text-gray-700">{r.name}</span>
+                      )}
                       <p className="text-xs text-gray-400">{r.tumorGroup.name}</p>
                       {r.publishStatus === 'PENDING_REVIEW' && r.approvedByFirst && (
                         <p className="text-xs text-amber-600 mt-0.5">

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
+import { prisma, PUBLISHED } from '@/lib/prisma';
 import RegimenCard from '@/components/regimen-card';
 import { Activity, Sun, Wind, Heart, Flower2, Droplets, ScanFace, Droplet, Brain, Bone } from 'lucide-react';
 
@@ -30,7 +30,7 @@ export default async function TumorGroupPage({ params, searchParams }: Props) {
     include: {
       regimens: {
         where: {
-          isActive: true,
+          ...PUBLISHED,
           ...(searchParams.type ? { treatmentType: searchParams.type as any } : {}),
         },
         orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
@@ -41,7 +41,7 @@ export default async function TumorGroupPage({ params, searchParams }: Props) {
   if (!tumorGroup) notFound();
 
   const allTypes = await prisma.regimen.findMany({
-    where: { tumorGroupId: tumorGroup.id, isActive: true },
+    where: { tumorGroupId: tumorGroup.id, ...PUBLISHED },
     select: { treatmentType: true },
     distinct: ['treatmentType'],
   });
@@ -67,7 +67,9 @@ export default async function TumorGroupPage({ params, searchParams }: Props) {
           {tumorGroup.description && (
             <p className="text-gray-500 mt-1">{tumorGroup.description}</p>
           )}
-          <p className="text-sm text-medical-blue mt-1">{tumorGroup.regimens.length} behandlingsregimer</p>
+          <p className="text-sm text-medical-blue mt-1">
+            {tumorGroup.regimens.length > 0 ? `${tumorGroup.regimens.length} behandlingsregimer` : 'Ingen kurer i demoen ennå'}
+          </p>
         </div>
       </div>
 
@@ -98,7 +100,9 @@ export default async function TumorGroupPage({ params, searchParams }: Props) {
 
       {/* Regimen grid */}
       {tumorGroup.regimens.length === 0 ? (
-        <p className="text-gray-500 py-8 text-center">Ingen kurer funnet.</p>
+        <p className="text-gray-500 py-8 text-center">
+          {searchParams.type ? 'Ingen kurer av denne typen.' : 'Denne kreftgruppen har ingen kurer i demoen ennå.'}
+        </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {tumorGroup.regimens.map((r) => (

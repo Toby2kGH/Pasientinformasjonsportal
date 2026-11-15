@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
+import { prisma, PUBLISHED } from '@/lib/prisma';
 import PatientInfoSheet from '@/components/patient-info-sheet';
 import HospitalSelector from '@/components/hospital-selector';
 
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props) {
     where: { slug: params.kur },
     include: { tumorGroup: true },
   });
-  if (!regimen) return { title: 'Ikke funnet' };
+  if (!regimen || regimen.publishStatus !== 'APPROVED' || !regimen.isActive) return { title: 'Ikke funnet' };
   return {
     title: `${regimen.name} — KreftInfo Norge`,
     description: `Pasientinformasjon om behandling med ${regimen.name} ved ${regimen.tumorGroup.name}.`,
@@ -34,7 +34,12 @@ export default async function RegimenPage({ params }: Props) {
     },
   });
 
-  if (!regimen || regimen.tumorGroup.slug !== params.tumorgruppe) notFound();
+  if (
+    !regimen ||
+    regimen.publishStatus !== 'APPROVED' ||
+    !regimen.isActive ||
+    regimen.tumorGroup.slug !== params.tumorgruppe
+  ) notFound();
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -64,7 +69,7 @@ export default async function RegimenPage({ params }: Props) {
             <p className="font-medium text-gray-700">Dokumentinfo</p>
             <p>Versjon {regimen.version}</p>
             {regimen.lastReviewedAt && (
-              <p>Sist gjennomgått: {new Date(regimen.lastReviewedAt).toLocaleDateString('nb-NO')}</p>
+              <p>Godkjent: {new Date(regimen.lastReviewedAt).toLocaleDateString('nb-NO')}</p>
             )}
             {regimen.lastReviewedBy && <p>Av: {regimen.lastReviewedBy}</p>}
             {regimen.sourceReference && (
@@ -87,7 +92,7 @@ export default async function RegimenPage({ params }: Props) {
 
 async function OtherRegimens({ tumorGroupId, currentSlug, tumorGroupSlug }: { tumorGroupId: string; currentSlug: string; tumorGroupSlug: string }) {
   const others = await prisma.regimen.findMany({
-    where: { tumorGroupId, isActive: true, NOT: { slug: currentSlug } },
+    where: { tumorGroupId, ...PUBLISHED, NOT: { slug: currentSlug } },
     orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
     take: 6,
     select: { name: true, slug: true },

@@ -37,18 +37,21 @@ export async function GET(request: NextRequest) {
   let regimens;
   try {
     // Build tsquery: each word becomes a prefix search term joined with OR
+    // Bare bokstaver og tall i hvert ord, så brukerinput ikke gir syntaksfeil i to_tsquery
     const tsquery = expanded
-      .split(/\s+/)
+      .toLowerCase()
+      .split(/[^a-z0-9æøåäöüé]+/)
       .filter(Boolean)
       .map((w) => `${w}:*`)
       .join(' | ');
+    if (!tsquery) return NextResponse.json([]);
 
     regimens = await prisma.$queryRaw<
       Array<{ id: string; name: string; slug: string; tumorGroupId: string }>
     >`
       SELECT r.id, r.name, r.slug, r."tumorGroupId"
       FROM "Regimen" r
-      WHERE r."isActive" = true
+      WHERE r."isActive" = true -- samme regel som PUBLISHED i lib/prisma.ts
         AND r."publishStatus" = 'APPROVED'
         AND r."searchVector" @@ to_tsquery('simple', ${tsquery})
       ORDER BY ts_rank(r."searchVector", to_tsquery('simple', ${tsquery})) DESC
@@ -59,6 +62,7 @@ export async function GET(request: NextRequest) {
     regimens = await prisma.regimen.findMany({
       where: {
         isActive: true,
+        publishStatus: 'APPROVED',
         OR: [
           { name: { contains: expanded, mode: 'insensitive' } },
           { genericNames: { hasSome: expanded.split(/\s+/) } },

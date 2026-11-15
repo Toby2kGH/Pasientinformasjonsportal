@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
+import { prisma, PUBLISHED } from '@/lib/prisma';
 import TumorGroupCard from '@/components/tumor-group-card';
 import SearchBar from '@/components/search-bar';
 
@@ -8,7 +8,7 @@ export const revalidate = 3600;
 export default async function HomePage() {
   const tumorGroups = await prisma.tumorGroup.findMany({
     orderBy: { sortOrder: 'asc' },
-    include: { _count: { select: { regimens: { where: { isActive: true } } } } },
+    include: { _count: { select: { regimens: { where: PUBLISHED } } } },
   });
 
   const totalRegimens = tumorGroups.reduce((sum, tg) => sum + tg._count.regimens, 0);
@@ -25,8 +25,8 @@ export default async function HomePage() {
             Nasjonal pasientinformasjonsportal for kreftbehandling
           </p>
           <p className="text-blue-300 text-sm mb-8 max-w-2xl mx-auto">
-            Nasjonalt kvalitetssikret informasjon om {totalRegimens} cellegiftkurer og
-            behandlingsregimer — tilpasset ditt lokale sykehus ved utskrift.
+            Demo med {totalRegimens} eksempelkurer: én nasjonal tekst per kur, tilpasset
+            ditt lokale sykehus ved utskrift.
           </p>
 
           {/* Search */}
@@ -81,14 +81,15 @@ export default async function HomePage() {
       </section>
 
       {/* Quality assurance banner */}
-      <section className="bg-green-50 border-y border-green-200 py-8 px-4">
+      <section className="bg-amber-50 border-y border-amber-200 py-8 px-4">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-start gap-4">
-          <div className="text-3xl">🛡️</div>
+          <div className="text-3xl">⚠️</div>
           <div>
-            <h3 className="font-serif font-semibold text-green-800 mb-1">Nasjonalt kvalitetssikret innhold</h3>
-            <p className="text-green-700 text-sm">
-              Informasjonen er basert på Helsedirektoratets nasjonale handlingsprogrammer for kreftbehandling
-              og er jevnlig gjennomgått av faglig ekspertise. Sist faglig oppdatering fremgår av hvert enkelt pasientark.
+            <h3 className="font-serif font-semibold text-amber-900 mb-1">Dette er en demo</h3>
+            <p className="text-amber-800 text-sm">
+              Demoen viser funksjonaliteten en nasjonal løsning bør ha: felles kurinformasjon,
+              godkjenning av to fagpersoner før publisering, og utskrift med lokal kontaktinformasjon.
+              Kurtekstene og telefonnumrene er eksempler og er ikke faglig eller faktisk kontrollert.
             </p>
           </div>
         </div>

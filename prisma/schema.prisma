@@ -92,9 +92,12 @@ model Regimen {
   sourceReference     String?
   cytodoseCode        String?
   version             Int                  @default(1)
+  // Fulltekstsøk. Fylles av databasetrigger (se init-migreringen), ikke av appen.
+  searchVector        Unsupported("tsvector")?
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
 
+  @@index([searchVector], type: Gin)
   @@index([tumorGroupId])
   @@index([slug])
   @@index([publishStatus])

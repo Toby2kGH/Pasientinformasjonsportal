@@ -21,9 +21,8 @@ export default function ContactFooter() {
             <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg p-2.5">
               <AlertTriangle className="text-red-600 shrink-0 mt-0.5" size={16} />
               <div>
-                <p className="text-xs font-semibold text-red-700">Akuttmottak</p>
+                <p className="text-xs font-semibold text-red-700">Utenom åpningstid</p>
                 <p className="text-sm font-bold text-red-800">{selected.emergencyPhone}</p>
-                <p className="text-xs text-red-600">Alltid åpent</p>
               </div>
             </div>
           )}
@@ -58,9 +57,6 @@ export default function ContactFooter() {
             </div>
           )}
         </div>
-        <p className="text-xs text-gray-400 mt-3">
-          Kilder: kreftlex.no | felleskatalogen.no | nasjonale handlingsprogrammer (Helsedirektoratet)
-        </p>
       </div>
     </div>
   );
