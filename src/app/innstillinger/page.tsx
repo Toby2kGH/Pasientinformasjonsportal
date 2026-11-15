@@ -27,7 +27,7 @@ export default function InnstillingerPage() {
               <p className="text-green-600 text-sm">{selected.departmentName}</p>
               {selected.address && <p className="text-green-600 text-xs mt-1">{selected.address}</p>}
               {selected.phoneNumber && <p className="text-green-600 text-xs">📞 Poliklinikk: {selected.phoneNumber}</p>}
-              {selected.emergencyPhone && <p className="text-green-600 text-xs">🚨 Akuttmottak: {selected.emergencyPhone}</p>}
+              {selected.emergencyPhone && <p className="text-green-600 text-xs">Utenom åpningstid: {selected.emergencyPhone}</p>}
             </div>
             <button
               onClick={() => setSelected(null)}

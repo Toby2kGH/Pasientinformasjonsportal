@@ -34,14 +34,18 @@ async function main() {
   // ============================================================
   // SYKEHUS OG AVDELINGER
   // ============================================================
+  // Kontaktopplysninger hentet fra sykehusenes egne nettsider 15.11.2026, via
+  // søkeutdrag (sidene ble ikke åpnet direkte). Må stikkprøves før bruk utenfor demo.
+  // emergencyPhone settes bare der sykehuset selv oppgir en egen linje for
+  // kreftpasienter utenom åpningstid. Sentralbord er ikke et akuttnummer.
   const hospitalsData = [
     {
       name: 'Oslo universitetssykehus', shortName: 'OUS',
       logoUrl: '/logos/ous.svg', websiteUrl: 'https://www.oslo-universitetssykehus.no',
       regionId: sorOst.id, sortOrder: 1,
       departments: [
-        { name: 'Kreftklinikken – Radiumhospitalet', phoneNumber: '22 93 40 00', emergencyPhone: '22 11 73 50', openingHours: 'man-fre kl. 08:00-15:30', address: 'Ullernchausseen 70, 0379 Oslo' },
-        { name: 'Kreftklinikken – Ullevål', phoneNumber: '22 11 80 00', emergencyPhone: '22 11 73 50', openingHours: 'man-fre kl. 08:00-15:30', address: 'Kirkeveien 166, 0450 Oslo' },
+        { name: 'Avdeling for kreftbehandling – Radiumhospitalet', phoneNumber: '22 93 40 00', emergencyPhone: null, openingHours: 'man–fre kl. 08:00–17:00', address: 'Ullernchausseen 70, 0379 Oslo' },
+        { name: 'Avdeling for kreftbehandling – Ullevål', phoneNumber: '23 01 55 73', emergencyPhone: null, openingHours: null, address: 'Kirkeveien 166, 0450 Oslo (bygg 11)' },
       ],
     },
     {
@@ -49,7 +53,7 @@ async function main() {
       logoUrl: '/logos/ahus.svg', websiteUrl: 'https://www.ahus.no',
       regionId: sorOst.id, sortOrder: 2,
       departments: [
-        { name: 'Onkologisk avdeling', phoneNumber: '67 96 43 25', emergencyPhone: '67 96 11 11', openingHours: 'man-fre kl. 08:30-11:00 og 12:00-15:00', address: 'Sykehusveien 25, 1478 Lørenskog' },
+        { name: 'Onkologisk og hematologisk poliklinikk', phoneNumber: '67 96 38 00', emergencyPhone: null, openingHours: 'man–fre kl. 09:00–11:30 og 12:30–14:30', address: 'Sykehusveien 25, 1478 Lørenskog' },
       ],
     },
     {
@@ -57,7 +61,7 @@ async function main() {
       logoUrl: '/logos/so.svg', websiteUrl: 'https://www.sykehuset-ostfold.no',
       regionId: sorOst.id, sortOrder: 3,
       departments: [
-        { name: 'Kreftavdelingen', phoneNumber: '69 86 00 00', emergencyPhone: '69 86 00 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Kalnesveien 300, 1714 Grålum' },
+        { name: 'Kreft og hematologi poliklinikk', phoneNumber: '69 86 31 20', emergencyPhone: null, openingHours: 'man–fre kl. 08:00–15:30', address: 'Kalnesveien 300, 1714 Grålum' },
       ],
     },
     {
@@ -65,7 +69,7 @@ async function main() {
       logoUrl: '/logos/siv.svg', websiteUrl: 'https://www.siv.no',
       regionId: sorOst.id, sortOrder: 4,
       departments: [
-        { name: 'Onkologisk seksjon', phoneNumber: '33 34 20 00', emergencyPhone: '33 34 20 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Halfdan Wilhelmsens allé 17, 3116 Tønsberg' },
+        { name: 'Kreft- og blodsykdompoliklinikk', phoneNumber: '33 34 26 22', emergencyPhone: null, openingHours: 'man–fre kl. 08:00–15:00 (stengt 11:30–12:00)', address: 'Halfdan Wilhelmsens allé 17, 3116 Tønsberg' },
       ],
     },
     {
@@ -73,8 +77,8 @@ async function main() {
       logoUrl: '/logos/si.svg', websiteUrl: 'https://www.sykehuset-innlandet.no',
       regionId: sorOst.id, sortOrder: 5,
       departments: [
-        { name: 'Kreftenhet Hamar', phoneNumber: '62 53 50 00', emergencyPhone: '62 53 50 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Skolegata 32, 2318 Hamar' },
-        { name: 'Kreftenhet Gjøvik', phoneNumber: '61 15 20 00', emergencyPhone: '61 15 20 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Kyrre Grepps gate 11, 2819 Gjøvik' },
+        { name: 'Kreftpoliklinikken Hamar', phoneNumber: '62 33 30 00', emergencyPhone: null, openingHours: 'Sentralbord – be om kreftpoliklinikken', address: 'Skolegata 32, 2318 Hamar' },
+        { name: 'Kreftenheten Gjøvik', phoneNumber: '62 33 30 00', emergencyPhone: null, openingHours: 'Sentralbord – be om kreftenheten', address: 'Kyrre Grepps gate 11, 2819 Gjøvik' },
       ],
     },
     {
@@ -82,7 +86,7 @@ async function main() {
       logoUrl: '/logos/sshf.svg', websiteUrl: 'https://www.sshf.no',
       regionId: sorOst.id, sortOrder: 6,
       departments: [
-        { name: 'Onkologisk seksjon, Kristiansand', phoneNumber: '38 07 30 00', emergencyPhone: '38 07 30 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Eg, 4604 Kristiansand' },
+        { name: 'Kreftpoliklinikken, Kristiansand', phoneNumber: '38 14 66 00', emergencyPhone: null, openingHours: 'man–fre kl. 08:00–15:30', address: 'Egsveien 100, bygg 43, Kristiansand' },
       ],
     },
     {
@@ -90,7 +94,7 @@ async function main() {
       logoUrl: '/logos/vv.svg', websiteUrl: 'https://www.vestreviken.no',
       regionId: sorOst.id, sortOrder: 7,
       departments: [
-        { name: 'Onkologisk poliklinikk, Drammen', phoneNumber: '32 80 30 00', emergencyPhone: '32 80 30 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Dronninggata 28, 3004 Drammen' },
+        { name: 'Kreftpoliklinikk, Drammen sykehus', phoneNumber: '32 00 02 45', emergencyPhone: null, openingHours: 'man–fre kl. 08:00–10:00 og 14:00–15:00', address: 'Jacob Borchs gate 10, 3004 Drammen (inngang D)' },
       ],
     },
     {
@@ -98,7 +102,7 @@ async function main() {
       logoUrl: '/logos/sthf.svg', websiteUrl: 'https://www.sthf.no',
       regionId: sorOst.id, sortOrder: 8,
       departments: [
-        { name: 'Kreftavdelingen', phoneNumber: '35 00 30 00', emergencyPhone: '35 00 30 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Ulefossveien 55, 3710 Skien' },
+        { name: 'Kreft og blodsykdommer poliklinikk', phoneNumber: '35 00 48 45', emergencyPhone: null, openingHours: 'man–fre kl. 08:00–11:00 og 12:00–15:00', address: 'Ulefossveien 55, 3710 Skien' },
       ],
     },
     {
@@ -106,7 +110,7 @@ async function main() {
       logoUrl: '/logos/hus.svg', websiteUrl: 'https://www.helse-bergen.no',
       regionId: vest.id, sortOrder: 9,
       departments: [
-        { name: 'Avdeling for kreftbehandling', phoneNumber: '55 97 20 10', emergencyPhone: '55 97 50 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Jonas Lies vei 65, 5021 Bergen' },
+        { name: 'Kreftklinikken – Kreft poliklinikk', phoneNumber: '55 97 20 10', emergencyPhone: null, openingHours: 'man–fre kl. 08:00–15:30. Etter kl. 15:30 settes samtalen over til kreftsengepost.', address: 'Parkbygget, Haukelandsveien 22, 5021 Bergen' },
       ],
     },
     {
@@ -114,7 +118,7 @@ async function main() {
       logoUrl: '/logos/sus.svg', websiteUrl: 'https://www.helse-stavanger.no',
       regionId: vest.id, sortOrder: 10,
       departments: [
-        { name: 'Avdeling for blod- og kreftsykdommer', phoneNumber: '51 51 80 00', emergencyPhone: '51 51 80 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Gerd-Ragna Bloch Thorsens gate 8, 4011 Stavanger' },
+        { name: 'Onkologisk poliklinikk Våland', phoneNumber: '51 80 69 30', emergencyPhone: null, openingHours: 'man–fre kl. 08:00–15:00', address: 'Gerd-Ragna Bloch Thorsens gate 20, 4011 Stavanger (inngang 9)' },
       ],
     },
     {
@@ -122,7 +126,7 @@ async function main() {
       logoUrl: '/logos/fonna.svg', websiteUrl: 'https://www.helse-fonna.no',
       regionId: vest.id, sortOrder: 11,
       departments: [
-        { name: 'Kreftavdelingen', phoneNumber: '52 73 20 00', emergencyPhone: '52 73 20 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Karmsundgata 120, 5528 Haugesund' },
+        { name: 'Kreftpoliklinikk Haugesund', phoneNumber: '52 73 25 80', emergencyPhone: null, openingHours: 'man–fre kl. 08:00–15:00', address: 'Karmsundgata 120, 5528 Haugesund' },
       ],
     },
     {
@@ -130,7 +134,7 @@ async function main() {
       logoUrl: '/logos/stolav.svg', websiteUrl: 'https://www.stolav.no',
       regionId: midtNorge.id, sortOrder: 12,
       departments: [
-        { name: 'Kreftklinikken', phoneNumber: '72 57 30 00', emergencyPhone: '72 57 60 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Prinsesse Kristinas gate 1, 7030 Trondheim' },
+        { name: 'Kreftklinikken – poliklinikk og dagsenter', phoneNumber: '72 82 58 10', emergencyPhone: '72 82 58 30', openingHours: 'Dagtid', address: 'Gastrosenteret, Professor Brochs gate 2, 7030 Trondheim' },
       ],
     },
     {
@@ -138,7 +142,7 @@ async function main() {
       logoUrl: '/logos/alesund.svg', websiteUrl: 'https://www.helse-mr.no',
       regionId: midtNorge.id, sortOrder: 13,
       departments: [
-        { name: 'Onkologisk poliklinikk', phoneNumber: '70 10 50 00', emergencyPhone: '70 10 50 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Åsehaugen 5, 6017 Ålesund' },
+        { name: 'Kreftpoliklinikken Ålesund', phoneNumber: '70 10 69 15', emergencyPhone: null, openingHours: 'man–fre kl. 08:00–12:00 og 13:30–15:30', address: 'Åsehaugen 17, Ålesund' },
       ],
     },
     {
@@ -146,7 +150,7 @@ async function main() {
       logoUrl: '/logos/unn.svg', websiteUrl: 'https://www.unn.no',
       regionId: nord.id, sortOrder: 14,
       departments: [
-        { name: 'Kreftavdelingen', phoneNumber: '77 62 67 65', emergencyPhone: '77 62 60 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Hansine Hansens vei 18, 9019 Tromsø' },
+        { name: 'Kreftpoliklinikken Tromsø', phoneNumber: '77 62 67 65', emergencyPhone: null, openingHours: 'man–fre kl. 08:00–15:00', address: 'Hansine Hansens veg 67, 9019 Tromsø (fløy D, plan 2)' },
       ],
     },
     {
@@ -154,7 +158,7 @@ async function main() {
       logoUrl: '/logos/nlsh.svg', websiteUrl: 'https://www.nordlandssykehuset.no',
       regionId: nord.id, sortOrder: 15,
       departments: [
-        { name: 'Avdeling for kreft og lindrende behandling', phoneNumber: '75 53 40 00', emergencyPhone: '75 53 40 00', openingHours: 'man-fre kl. 08:00-15:30', address: 'Prinsens gate 164, 8005 Bodø' },
+        { name: 'Avdeling for kreft og lindrende behandling', phoneNumber: '75 53 40 32', emergencyPhone: null, openingHours: null, address: 'Parkveien 95, 8005 Bodø' },
       ],
     },
   ];
@@ -165,6 +169,10 @@ async function main() {
       where: { id: hospitalFields.shortName },
       update: {},
       create: { ...hospitalFields, id: hospitalFields.shortName },
+    });
+    await prisma.department.updateMany({
+      where: { hospitalId: hospital.id, name: { notIn: departments.map((d) => d.name) } },
+      data: { isActive: false },
     });
     for (const dept of departments) {
       // Der «akuttnummeret» er det samme som avdelingens nummer, er det ikke et eget

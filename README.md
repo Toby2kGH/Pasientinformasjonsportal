@@ -20,8 +20,10 @@ Demoen viser funksjonalitet en nasjonal løsning bør ha:
 - 15 eksempelkurer innen fire av ti kreftgrupper (GI, melanom, lunge, bryst). 12 er lagt inn
   som «demogodkjent» av to demobrukere. Tre ligger i godkjenningsflyten (FLOX som utkast,
   Nivolumab og FOLFIRI til gjennomgang), så flyten kan vises.
-- 15 sykehus med 17 avdelinger. Numrene er ikke kontrollert. Der «akuttnummeret» var likt
-  avdelingens nummer, vises det ikke som akuttnummer.
+- 15 sykehus med 17 avdelinger. Telefon, telefontid og adresse er hentet fra sykehusenes egne
+  nettsider 15.11.2026, men via søkeutdrag, ikke ved å åpne sidene. Stikkprøv før bruk.
+  Sykehuset Innlandet har ikke eget avdelingsnummer på nett; der vises sentralbordet. Bare St. Olav
+  oppgir en egen linje for kreftpasienter utenom åpningstid; den vises som «Utenom åpningstid».
 
 ## Kom i gang
 
