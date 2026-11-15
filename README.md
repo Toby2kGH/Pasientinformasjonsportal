@@ -19,7 +19,7 @@ Demoen viser funksjonalitet en nasjonal løsning bør ha:
 
 - 15 eksempelkurer innen fire av ti kreftgrupper (GI, melanom, lunge, bryst). 12 er lagt inn
   som «demogodkjent» av to demobrukere. Tre ligger i godkjenningsflyten (FLOX som utkast,
-  Nivolumab og Karboplatin + Pemetreksed + Pembrolizumab til gjennomgang), så flyten kan vises.
+  Nivolumab og FOLFIRI til gjennomgang), så flyten kan vises.
 - 15 sykehus med 17 avdelinger. Numrene er ikke kontrollert. Der «akuttnummeret» var likt
   avdelingens nummer, vises det ikke som akuttnummer.
 
@@ -28,7 +28,7 @@ Demoen viser funksjonalitet en nasjonal løsning bør ha:
 Forutsetninger: Node.js 18+ og Docker (eller en annen PostgreSQL 16).
 
 ```bash
-cp .env.example .env          # sett ADMIN_PASSWORD
+cp .env.example .env
 docker compose up -d db
 npm install
 npx prisma migrate deploy     # lager tabeller og fulltekstsøk
@@ -36,15 +36,16 @@ npx prisma db seed            # legger inn eksempeldata
 npm run dev                   # åpne http://localhost:3000
 ```
 
-Redaksjonsverktøyet ligger på `/admin` og krever brukernavn og passord fra `.env`
-(`ADMIN_USER`, standard `admin`, og `ADMIN_PASSWORD`). Uten `ADMIN_PASSWORD` er det stengt.
+Redaksjonsverktøyet ligger på `/admin` og er åpent uten passord. Legges demoen på en
+adresse andre kan nå, sett `ADMIN_PASSWORD` (og eventuelt `ADMIN_USER`, standard `admin`)
+i `.env`. Ellers kan hvem som helst godkjenne og arkivere kurer.
 
 ## Teknisk
 
 - Next.js 14 (App Router) + TypeScript, PostgreSQL + Prisma, Tailwind CSS
 - `prisma/schema.prisma` — datamodell. `prisma/seed.ts` — eksempeldata.
 - `src/lib/prisma.ts` — `PUBLISHED`-filteret som alle offentlige spørringer bruker
-- `src/middleware.ts` og `src/lib/admin-auth.ts` — innlogging til redaksjonsverktøyet
+- `src/middleware.ts` og `src/lib/admin-auth.ts` — valgfri innlogging til redaksjonsverktøyet
 
 ## Det demoen ikke løser (kreves før bruk med pasienter)
 
@@ -52,7 +53,7 @@ Redaksjonsverktøyet ligger på `/admin` og krever brukernavn og passord fra `.e
   oppdateres det når handlingsprogrammene endres
 - **Faglig gjennomgang av alt innhold** av onkolog og kreftsykepleier
 - **Kontrollerte kontaktopplysninger** fra hvert sykehus, og ekte logoer med tillatelse
-- **Innlogging med personlig identitet (HelseID).** Demoen bruker ett felles passord, og
-  godkjenners navn skrives inn som fritekst.
+- **Innlogging med personlig identitet (HelseID).** Demoen har ingen eller ett felles passord,
+  og godkjenners navn skrives inn som fritekst.
 - Redigering av kurtekster i verktøyet (i dag bare godkjenningsflyt)
 - Drift: connection pooling, sikkerhetskopi, overvåking, universell utforming testet

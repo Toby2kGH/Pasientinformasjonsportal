@@ -170,7 +170,14 @@ async function main() {
       // Der «akuttnummeret» er det samme som avdelingens nummer, er det ikke et eget
       // akuttnummer (trolig sentralbord). Vis det da ikke som «Akuttmottak».
       const emergencyPhone = dept.emergencyPhone !== dept.phoneNumber ? dept.emergencyPhone : null;
-      await prisma.department.create({ data: { ...dept, emergencyPhone, hospitalId: hospital.id } }).catch(() => {});
+      // Kan kjøres flere ganger uten å lage doble avdelinger
+      const existingDept = await prisma.department.findFirst({ where: { hospitalId: hospital.id, name: dept.name } });
+      const deptData = { ...dept, emergencyPhone, hospitalId: hospital.id };
+      if (existingDept) {
+        await prisma.department.update({ where: { id: existingDept.id }, data: deptData });
+      } else {
+        await prisma.department.create({ data: deptData });
+      }
     }
   }
 
@@ -214,7 +221,7 @@ async function main() {
   const demoWorkflow: Record<string, { status: PublishStatus; first?: string }> = {
     'flox': { status: PublishStatus.DRAFT },
     'nivolumab': { status: PublishStatus.PENDING_REVIEW },
-    'karboplatin-pemetreksed-pembrolizumab': { status: PublishStatus.PENDING_REVIEW, first: 'Demobruker A' },
+    'folfiri': { status: PublishStatus.PENDING_REVIEW, first: 'Demobruker A' },
   };
   const seededAt = new Date();
 

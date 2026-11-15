@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Source_Serif_4, IBM_Plex_Sans } from 'next/font/google';
 import './globals.css';
 import { HospitalProvider } from '@/lib/hospital-context';
@@ -31,12 +31,15 @@ export const metadata: Metadata = {
   description: 'Demo av en nasjonal pasientinformasjonsportal for kreftbehandling. Innholdet er eksempeltekst og er ikke faglig kvalitetssikret.',
   keywords: 'kreft, cellegift, immunterapi, pasientinformasjon, onkologi, Norge',
   manifest: '/manifest.json',
-  themeColor: '#1E3A5F',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'KreftInfo Norge',
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#1E3A5F',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

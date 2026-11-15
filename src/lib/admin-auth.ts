@@ -1,11 +1,12 @@
 /**
- * Enkel innlogging for redigeringsverktøyet i demoen (HTTP Basic Auth).
+ * Valgfri innlogging for redaksjonsverktøyet i demoen (HTTP Basic Auth).
  *
- * Fail closed: er ADMIN_PASSWORD ikke satt, er redigeringsverktøyet stengt.
- * Dette er en demoløsning. Nasjonal drift krever HelseID med personlig
+ * Uten ADMIN_PASSWORD er verktøyet åpent for alle (lokal demo).
+ * Med ADMIN_PASSWORD kreves brukernavn og passord. Sett det hvis demoen
+ * legges på en adresse andre kan nå. Dette er en demoløsning. Nasjonal drift krever HelseID med personlig
  * identitet, slik at godkjenner hentes fra innloggingen og ikke fra et tekstfelt.
  */
-export type AdminAuthResult = 'ok' | 'unauthorized' | 'disabled';
+export type AdminAuthResult = 'ok' | 'unauthorized';
 
 function safeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
@@ -17,7 +18,7 @@ function safeEqual(a: string, b: string): boolean {
 export function checkAdminAuth(authorizationHeader: string | null): AdminAuthResult {
   const user = process.env.ADMIN_USER ?? 'admin';
   const password = process.env.ADMIN_PASSWORD;
-  if (!password) return 'disabled';
+  if (!password) return 'ok';
   if (!authorizationHeader?.startsWith('Basic ')) return 'unauthorized';
 
   let decoded: string;

@@ -67,7 +67,9 @@ export default async function TumorGroupPage({ params, searchParams }: Props) {
           {tumorGroup.description && (
             <p className="text-gray-500 mt-1">{tumorGroup.description}</p>
           )}
-          <p className="text-sm text-medical-blue mt-1">{tumorGroup.regimens.length} behandlingsregimer</p>
+          <p className="text-sm text-medical-blue mt-1">
+            {tumorGroup.regimens.length > 0 ? `${tumorGroup.regimens.length} behandlingsregimer` : 'Ingen kurer i demoen ennå'}
+          </p>
         </div>
       </div>
 
@@ -98,7 +100,9 @@ export default async function TumorGroupPage({ params, searchParams }: Props) {
 
       {/* Regimen grid */}
       {tumorGroup.regimens.length === 0 ? (
-        <p className="text-gray-500 py-8 text-center">Ingen kurer funnet.</p>
+        <p className="text-gray-500 py-8 text-center">
+          {searchParams.type ? 'Ingen kurer av denne typen.' : 'Denne kreftgruppen har ingen kurer i demoen ennå.'}
+        </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {tumorGroup.regimens.map((r) => (

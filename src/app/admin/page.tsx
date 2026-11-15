@@ -44,7 +44,7 @@ export default async function AdminPage() {
       <div className="mb-8">
         <h1 className="font-serif text-3xl font-bold text-gray-900 mb-1">Redaksjonsverktøy</h1>
         <p className="text-gray-500 text-sm">
-          Godkjenningsflyt for kurinnhold. Bare godkjente kurer vises offentlig. Demo: felles passord og navn i fritekst. Nasjonal drift krever HelseID.
+          Godkjenningsflyt for kurinnhold. Bare godkjente kurer vises offentlig. Demo: navn i fritekst, ingen personlig innlogging. Nasjonal drift krever HelseID.
         </p>
       </div>
 

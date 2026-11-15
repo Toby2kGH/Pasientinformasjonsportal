@@ -41,7 +41,9 @@ export default function TumorGroupCard({ name, slug, description, iconName, regi
             <p className="text-sm text-gray-500 mt-1 line-clamp-2">{description}</p>
           )}
           {regimenCount !== undefined && (
-            <p className="text-xs text-medical-blue mt-2 font-medium">{regimenCount} kurer</p>
+            <p className={`text-xs mt-2 font-medium ${regimenCount > 0 ? 'text-medical-blue' : 'text-gray-400'}`}>
+              {regimenCount > 0 ? `${regimenCount} kurer` : 'Ingen kurer i demoen ennå'}
+            </p>
           )}
         </div>
       </div>
